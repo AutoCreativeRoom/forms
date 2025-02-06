@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro para Contrato</title>
+    <style>
+      /* Reset básico */
+      body,
+      h1,
+      h2,
+      h3,
+      p,
+      ul,
+      ol,
+      li,
+      input,
+      button {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+        max-width: 900px;
+      }
+
+      .form-group.inline {
+        display: flex;
+        gap: 15px;
+        justify-content: space-between;
+      }
+      .form-group.inline.cnpj .ttt {
+        display: inline-block;
+        max-width: 500px;
+        min-width: 350px;
+      }
+      .form-control {
+        flex: 1;
+      }
+
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      button.secondary {
+        background-color: #6c757d;
+      }
+
+      button.secondary:hover {
+        background-color: #565e64;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .responsavel {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+      }
+
+      .responsavel:last-child {
+        margin-bottom: 0;
+      }
+
+      #responsaveis-container {
+        margin-top: 20px;
+      }
+
+      .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .action-buttons button {
+        flex: 1;
+        margin: 0 5px;
+      }
+
+      .alert {
+        padding: 10px;
+        margin-top: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .alert.success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+
+      .alert.error {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- #### -->
+    <div class="container">
+      <h2>Cadastro para Contrato</h2>
+      <form id="contractForm">
+        <div class="form-group">
+          <label for="identificadorCliente">Identificador Cliente</label>
+          <input
+            type="text"
+            id="identificadorCliente"
+            name="identificadorCliente"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="razaoSocial">Razão Social</label>
+          <input type="text" id="razaoSocial" name="razaoSocial" required />
+        </div>
+        <div class="form-group inline cnpj">
+          <div class="form-group">
+            <label for="cnpj">CNPJ</label>
+            <input
+              type="text"
+              id="cnpj"
+              class="ttt"
+              name="cnpj"
+              maxlength="25"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="emailEmpresa">Email</label>
+            <input
+              type="email"
+              id="emailEmpresa"
+              class="ttt"
+              name="emailEmpresa"
+              required
+            />
+          </div>
+        </div>
+        <div class="wrapper_rua">
+          <div class="form-group inline">
+            <div class="form-control">
+              <label for="ruaEmpresa">Rua</label>
+              <input type="text" id="ruaEmpresa" name="ruaEmpresa" required />
+            </div>
+            <div class="form-control">
+              <label for="numeroEmpresa">Número</label>
+              <input
+                type="text"
+                id="numeroEmpresa"
+                name="numeroEmpresa"
+                required
+              />
+            </div>
+            <div class="form-control">
+              <label for="cepEmpresa">CEP</label>
+              <input type="text" id="cepEmpresa" name="cepEmpresa" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-group inline">
+          <div class="form-control">
+            <label for="bairroEmpresa">Bairro</label>
+            <input
+              type="text"
+              id="bairroEmpresa"
+              name="bairroEmpresa"
+              required
+            />
+          </div>
+          <div class="form-control">
+            <label for="cidadeEmpresa">Cidade</label>
+            <input
+              type="text"
+              id="cidadeEmpresa"
+              name="cidadeEmpresa"
+              required
+            />
+          </div>
+          <div class="form-control">
+            <label for="estadoEmpresa">Estado</label>
+            <input
+              type="text"
+              id="estadoEmpresa"
+              name="estadoEmpresa"
+              maxlength="2"
+              required
+            />
+          </div>
+        </div>
+        <div class="section-separator"></div>
+        <h2>Responsáveis</h2>
+        <div id="responsaveis-container">
+          <div class="responsavel">
+            <div class="form-group inline">
+              <div class="form-control">
+                <label for="nomeResponsavel">Nome</label>
+                <input
+                  type="text"
+                  id="nomeResponsavel0"
+                  name="nomeResponsavel[]"
+                  required
+                />
+              </div>
+              <div class="form-control">
+                <label for="cpfResponsavel">CPF</label>
+                <input
+                  type="text"
+                  id="cpfResponsavel0"
+                  name="cpfResponsavel[]"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group inline">
+              <div class="form-control">
+                <label for="emailResponsavel">Email</label>
+                <input
+                  type="email"
+                  id="emailResponsavel0"
+                  name="emailResponsavel[]"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group inline">
+              <div class="form-control">
+                <label for="ruaResponsavel">Rua</label>
+                <input
+                  type="text"
+                  id="ruaResponsavel0"
+                  name="ruaResponsavel[]"
+                  required
+                />
+              </div>
+              <div class="form-control">
+                <label for="numeroResponsavel">Número</label>
+                <input
+                  type="text"
+                  id="numeroResponsavel0"
+                  name="numeroResponsavel[]"
+                  required
+                />
+              </div>
+              <div class="form-control">
+                <label for="cepResponsavel">CEP</label>
+                <input
+                  type="text"
+                  id="cepResponsavel0"
+                  name="cepResponsavel[]"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group inline">
+              <div class="form-control">
+                <label for="bairroResponsavel">Bairro</label>
+                <input
+                  type="text"
+                  id="bairroResponsavel0"
+                  name="bairroResponsavel[]"
+                  required
+                />
+              </div>
+              <div class="form-control">
+                <label for="cidadeResponsavel">Cidade</label>
+                <input
+                  type="text"
+                  id="cidadeResponsavel0"
+                  name="cidadeResponsavel[]"
+                  required
+                />
+              </div>
+              <div class="form-control">
+                <label for="estadoResponsavel">Estado</label>
+                <input
+                  type="text"
+                  id="estadoResponsavel0"
+                  name="estadoResponsavel[]"
+                  maxlength="2"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="cargo">Cargo na Empresa</label>
+              <input type="text" id="cargo0" name="cargo[]" required />
+            </div>
+          </div>
+        </div>
+        <div class="wrapper_buttons">
+          <button type="button" id="addResponsavel" class="inline">
+            Adicionar Responsável
+          </button>
+          <button type="button" id="deleteResponsavel" class="delete">
+            Deletar Responsável
+          </button>
+        </div>
+        <div class="section-separator"></div>
+        <div class="form-group">
+          <label for="objetoContrato">Objeto do Contrato</label>
+          <textarea
+            id="objetoContrato"
+            name="objetoContrato"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="formaPagamento">Forma de Pagamento</label>
+          <textarea
+            id="formaPagamento"
+            name="formaPagamento"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+
+    <!-- END CONTAINER #### -->
+
+    <script>
+      let responsavelCount = 1;
+
+      document
+        .getElementById("addResponsavel")
+        .addEventListener("click", function () {
+          const responsaveisContainer = document.getElementById(
+            "responsaveis-container"
+          );
+          const newResponsavel = document.createElement("div");
+          newResponsavel.classList.add("responsavel");
+
+          newResponsavel.innerHTML = `
+      <div class="form-group inline">
+        <div class="form-control">
+          <label for="nomeResponsavel">Nome</label>
+          <input type="text" id="nomeResponsavel${responsavelCount}" name="nomeResponsavel[]" required />
+        </div>
+        <div class="form-control">
+          <label for="cpfResponsavel">CPF</label>
+          <input type="text" id="cpfResponsavel${responsavelCount}" name="cpfResponsavel[]" required />
+        </div>
+      </div>
+      <div class="form-group inline">
+        <div class="form-control">
+             <label for="emailResponsavel">Email</label>
+          <input type="email" id="emailResponsavel${responsavelCount}" name="emailResponsavel[]" required />
+        </div>
+      </div>
+      <div class="form-group inline">
+        <div class="form-control">
+          <label for="ruaResponsavel">Rua</label>
+          <input type="text" id="ruaResponsavel${responsavelCount}" name="ruaResponsavel[]" required />
+        </div>
+        <div class="form-control">
+          <label for="numeroResponsavel">Número</label>
+          <input type="text" id="numeroResponsavel${responsavelCount}" name="numeroResponsavel[]" required />
+        </div>
+        <div class="form-control">
+          <label for="cepResponsavel">CEP</label>
+          <input type="text" id="cepResponsavel${responsavelCount}" name="cepResponsavel[]" required />
+        </div>
+      </div>
+      <div class="form-group inline">
+        <div class="form-control">
+          <label for="bairroResponsavel">Bairro</label>
+          <input type="text" id="bairroResponsavel${responsavelCount}" name="bairroResponsavel[]" required />
+        </div>
+        <div class="form-control">
+          <label for="cidadeResponsavel">Cidade</label>
+          <input type="text" id="cidadeResponsavel${responsavelCount}" name="cidadeResponsavel[]" required />
+        </div>
+        <div class="form-control">
+          <label for="estadoResponsavel">Estado</label>
+          <input type="text" id="estadoResponsavel${responsavelCount}" name="estadoResponsavel[]" maxlength="2" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="cargo">Cargo na Empresa</label>
+        <input type="text" id="cargo${responsavelCount}" name="cargo[]" required />
+      </div>
+    `;
+
+          responsaveisContainer.appendChild(newResponsavel);
+          responsavelCount++;
+        });
+
+      document
+        .getElementById("deleteResponsavel")
+        .addEventListener("click", function () {
+          const responsaveisContainer = document.getElementById(
+            "responsaveis-container"
+          );
+          const responsaveis =
+            responsaveisContainer.querySelectorAll(".responsavel");
+          if (responsaveis.length > 1) {
+            responsaveisContainer.removeChild(
+              responsaveis[responsaveis.length - 1]
+            );
+            responsavelCount--;
+          }
+        });
+
+      document
+        .getElementById("contractForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Previne o envio padrão do formulário
+
+          const empresa = {
+            identificadorCliente: document.getElementById(
+              "identificadorCliente"
+            ).value,
+            razaoSocial: document.getElementById("razaoSocial").value,
+            cnpj: document.getElementById("cnpj").value,
+            email: document.getElementById("emailEmpresa").value,
+            endereco: {
+              rua: document.getElementById("ruaEmpresa").value,
+              numero: document.getElementById("numeroEmpresa").value,
+              cep: document.getElementById("cepEmpresa").value,
+              bairro: document.getElementById("bairroEmpresa").value,
+              cidade: document.getElementById("cidadeEmpresa").value,
+              estado: document.getElementById("estadoEmpresa").value,
+            },
+          };
+
+          // Coletando dados dos responsáveis
+          const responsaveis = [];
+          const responsaveisElements =
+            document.querySelectorAll(".responsavel");
+
+          responsaveisElements.forEach((responsavel, index) => {
+            responsaveis.push({
+              nome: responsavel.querySelector(`#nomeResponsavel${index}`).value,
+              email: responsavel.querySelector(`#emailResponsavel${index}`)
+                .value,
+              cpf: responsavel.querySelector(`#cpfResponsavel${index}`).value,
+              endereco: {
+                rua: responsavel.querySelector(`#ruaResponsavel${index}`).value,
+                numero: responsavel.querySelector(`#numeroResponsavel${index}`)
+                  .value,
+                cep: responsavel.querySelector(`#cepResponsavel${index}`).value,
+                bairro: responsavel.querySelector(`#bairroResponsavel${index}`)
+                  .value,
+                cidade: responsavel.querySelector(`#cidadeResponsavel${index}`)
+                  .value,
+                estado: responsavel.querySelector(`#estadoResponsavel${index}`)
+                  .value,
+              },
+              cargo: responsavel.querySelector(`#cargo${index}`).value,
+            });
+          });
+
+          const contrato = {
+            empresa,
+            responsaveis,
+            objetoContrato: document.getElementById("objetoContrato").value,
+            formaPagamento: document.getElementById("formaPagamento").value,
+          };
+
+          console.log("Contrato Enviado:", contrato);
+
+          // Enviando os dados para o webhook
+          fetch(
+            "https://webhook.autocreativeroom.com.br/webhook/contrato_form",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(contrato),
+            }
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Resposta do webhook:", data);
+              alert("Dados enviados com sucesso!");
+            })
+            .catch((error) => {
+              console.error("Erro ao enviar os dados:", error);
+              alert("Erro ao enviar os dados. Tente novamente.");
+            });
+        });
+
+      // Captura o parâmetro da URL e preenche o campo identificadorCliente
+      window.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get("identificadorCliente");
+
+        if (clientId) {
+          document.getElementById("identificadorCliente").value = clientId;
+        }
+      });
+    </script>
+  </body>
+</html>

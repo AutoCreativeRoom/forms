@@ -1,9 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Link de formularios</title>
+    <style>
+      .wrapper_page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 50px;
+      }
+
+      .link {
+        margin: 10px;
+        width: 500px;
+        max-width: 100%;
+        background-color: #b42e37;
+        text-align: center;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+      .link:hover {
+        background-color: #f42a37;
+      }
+      .link a {
+        display: inline-block;
+        padding: 15px 30px;
+        text-decoration: none;
+        color: #fff;
+        font-weight: 600;
+        font-family: "Poppins", sans-serif;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+    </style>
   </head>
-  <body></body>
+  <body>
+    <div class="wrapper_page">
+      <div class="link">
+        <a href="/pages/form_cliente.html">Formulario add CLIENTES</a>
+      </div>
+      <div class="link">
+        <a href="/pages/form_servico.html">Formulario add SERVIÇO</a>
+      </div>
+      <div class="link">
+        <a href="/pages/form_contrato.html">Formulario de CONTRATOS</a>
+      </div>
+      <div class="link">
+        <a href="/pages/scraping.html">Scraping Files</a>
+      </div>
+    </div>
+  </body>
 </html>

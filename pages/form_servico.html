@@ -1,0 +1,518 @@
+<!-- <!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulário de Cadastro</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #serviceForm {
+        width: 100%;
+        max-width: 700px;
+        background-color: #ffffff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 1.8em;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        border: 1px solid #e6e6e6;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        background-color: #fafafa;
+        position: relative;
+      }
+
+      .form-group h3 {
+        margin-top: 0;
+        font-size: 1.2em;
+        color: #555;
+      }
+
+      .remove-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 0.9em;
+        max-width: 100px;
+        align-self: self-end;
+      }
+
+      .remove-button:hover {
+        background-color: #ff1a1a;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      input,
+      textarea,
+      button {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      textarea {
+        resize: vertical;
+        height: 130px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      @media (max-width: 768px) {
+        #serviceForm {
+          padding: 15px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <form id="serviceForm">
+      <h1>Cadastro de Serviços</h1>
+      <label for="client-id">Identificador do Cliente:</label>
+      <input
+        type="text"
+        id="client-id"
+        name="client-id"
+        required
+        placeholder="Ex.: nome_12345678"
+      />
+
+      <div id="form-container">
+        <div class="form-group" data-id="1">
+          <h3>Serviço Proposto</h3>
+          <label for="service-1">Serviço:</label>
+          <input type="text" id="service-1" name="service-1" required />
+
+          <label for="client-1">Cliente:</label>
+          <input type="text" id="client-1" name="client-1" required />
+
+          <label for="description-1">Descrição:</label>
+          <textarea
+            id="description-1"
+            name="description-1"
+            rows="3"
+            required
+          ></textarea>
+
+          <label for="observation-1">Observação:</label>
+          <input type="text" id="observation-1" name="observation-1" />
+
+          <button
+            type="button"
+            class="remove-button"
+            onclick="removeGroup(this)"
+          >
+            Remover
+          </button>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="button" id="addGroup">Adicionar Novo Serviço</button>
+        <button type="reset">Limpar Formulário</button>
+        <button type="submit">Enviar</button>
+      </div>
+    </form>
+
+    <script>
+      let groupCounter = 1;
+
+      document.getElementById("addGroup").addEventListener("click", () => {
+        groupCounter++;
+        const formContainer = document.getElementById("form-container");
+        const newGroup = document.createElement("div");
+        newGroup.classList.add("form-group");
+        newGroup.setAttribute("data-id", groupCounter);
+        newGroup.innerHTML = `
+          <h3>Serviço Proposto</h3>
+          <label for="service-${groupCounter}">Serviço:</label>
+          <input type="text" id="service-${groupCounter}" name="service-${groupCounter}" required>
+
+          <label for="client-${groupCounter}">Cliente:</label>
+          <input type="text" id="client-${groupCounter}" name="client-${groupCounter}" required>
+
+          <label for="description-${groupCounter}">Descrição:</label>
+          <textarea id="description-${groupCounter}" name="description-${groupCounter}" rows="3" required></textarea>
+
+          <label for="observation-${groupCounter}">Observação:</label>
+          <input type="text" id="observation-${groupCounter}" name="observation-${groupCounter}">
+
+          <button type="button" class="remove-button" onclick="removeGroup(this)">Remover</button>
+        `;
+        formContainer.appendChild(newGroup);
+      });
+
+      function removeGroup(button) {
+        if (confirm("Tem certeza de que deseja remover este serviço?")) {
+          button.parentElement.remove();
+        }
+      }
+
+      document
+        .getElementById("serviceForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const data = {
+            clientId: formData.get("client-id"),
+            services: [],
+          };
+
+          formData.forEach((value, key) => {
+            if (
+              key.startsWith("service-") ||
+              key.startsWith("client-") ||
+              key.startsWith("description-") ||
+              key.startsWith("observation-")
+            ) {
+              const parts = key.split("-");
+              const groupId = parts[1];
+              const fieldName = parts[0];
+
+              if (!data.services[groupId - 1]) data.services[groupId - 1] = {};
+              data.services[groupId - 1][fieldName] = value;
+            }
+          });
+
+          data.services = data.services.filter(
+            (service) => service && Object.keys(service).length > 0
+          );
+
+          console.log(data);
+
+          try {
+            const response = await fetch(
+              "https://webhook.autocreativeroom.com.br/webhook/proposta",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              }
+            );
+
+            if (response.ok) {
+              alert("Dados enviados com sucesso!");
+              event.target.reset();
+            } else {
+              const errorMessage = await response.text();
+              alert(`Erro ao enviar os dados: ${errorMessage}`);
+            }
+          } catch (error) {
+            alert("Erro ao conectar com o servidor!");
+          }
+        });
+
+      // Captura o parâmetro da URL e preenche o campo client-id
+      window.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get("client-id");
+
+        if (clientId) {
+          document.getElementById("client-id").value = clientId;
+        }
+      });
+    </script>
+  </body>
+</html> -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulário de Cadastro</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        overflow-y: auto;
+        height: 100vh;
+      }
+
+      #serviceForm {
+        width: 100%;
+        max-width: 700px;
+        background-color: #ffffff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 1.8em;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        border: 1px solid #e6e6e6;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        background-color: #fafafa;
+        position: relative;
+      }
+
+      .form-group h3 {
+        margin-top: 0;
+        font-size: 1.2em;
+        color: #555;
+      }
+
+      .remove-button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 0.9em;
+      }
+
+      .remove-button:hover {
+        background-color: #ff1a1a;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      input,
+      textarea,
+      button {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      textarea {
+        resize: vertical;
+        height: 130px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .button-group {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      @media (max-width: 768px) {
+        #serviceForm {
+          padding: 15px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <form id="serviceForm">
+      <h1>Cadastro de Serviços</h1>
+
+      <!-- Campos fixos -->
+      <label for="client-id">Identificador do Cliente:</label>
+      <input
+        type="text"
+        id="client-id"
+        name="client-id"
+        required
+        placeholder="Ex.: nome_12345678"
+      />
+
+      <label for="client-name">Cliente:</label>
+      <input
+        type="text"
+        id="client-name"
+        name="client-name"
+        required
+        placeholder="Ex.: Nome do Cliente"
+      />
+
+      <!-- Container de serviços dinâmicos -->
+      <div id="form-container"></div>
+
+      <!-- Botões -->
+      <div class="button-group">
+        <button type="button" id="addGroup">Adicionar Serviço</button>
+        <button type="reset">Limpar Formulário</button>
+        <button type="submit">Enviar</button>
+      </div>
+    </form>
+
+    <script>
+      let groupCounter = 0;
+
+      // Adicionar novo grupo de serviços
+      document.getElementById("addGroup").addEventListener("click", () => {
+        groupCounter++;
+        const formContainer = document.getElementById("form-container");
+        const newGroup = document.createElement("div");
+        newGroup.classList.add("form-group");
+        newGroup.setAttribute("data-id", groupCounter);
+        newGroup.innerHTML = `
+          <h3>Serviço Proposto</h3>
+          <label for="service-${groupCounter}">Serviço:</label>
+          <input type="text" id="service-${groupCounter}" name="service-${groupCounter}" required />
+
+          <label for="description-${groupCounter}">Descrição:</label>
+          <textarea id="description-${groupCounter}" name="description-${groupCounter}" rows="3" required></textarea>
+
+          <label for="observation-${groupCounter}">Observação:</label>
+          <input type="text" id="observation-${groupCounter}" name="observation-${groupCounter}" />
+
+          <button type="button" class="remove-button" onclick="removeGroup(this)">Remover</button>
+        `;
+        formContainer.appendChild(newGroup);
+      });
+
+      // Remover grupo de serviços
+      function removeGroup(button) {
+        if (confirm("Tem certeza de que deseja remover este serviço?")) {
+          button.parentElement.remove();
+        }
+      }
+
+      // Submissão do formulário
+      document
+        .getElementById("serviceForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.target);
+          const data = {
+            clientId: formData.get("client-id"),
+            clientName: formData.get("client-name"),
+            services: [],
+          };
+
+          formData.forEach((value, key) => {
+            if (
+              key.startsWith("service-") ||
+              key.startsWith("description-") ||
+              key.startsWith("observation-")
+            ) {
+              const [field, id] = key.split("-");
+              if (!data.services[id - 1]) data.services[id - 1] = {};
+              data.services[id - 1][field] = value;
+            }
+          });
+
+          console.log(data);
+
+          try {
+            const response = await fetch(
+              "https://webhook.autocreativeroom.com.br/webhook/proposta",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              }
+            );
+
+            if (response.ok) {
+              alert("Dados enviados com sucesso!");
+              event.target.reset();
+              document.getElementById("form-container").innerHTML = "";
+              groupCounter = 0;
+            } else {
+              const errorMessage = await response.text();
+              alert(`Erro ao enviar os dados: ${errorMessage}`);
+            }
+          } catch (error) {
+            alert("Erro ao conectar com o servidor!");
+          }
+        });
+
+      // Captura o parâmetro da URL e preenche o campo client-id
+      window.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get("client-id");
+
+        if (clientId) {
+          document.getElementById("client-id").value = clientId;
+        }
+      });
+    </script>
+  </body>
+</html>
