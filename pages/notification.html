@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat Notification</title>
+    <style>
+      /* Estilos básicos para a interface */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .notification {
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .notification:last-child {
+        border-bottom: none;
+      }
+      .content {
+        flex: 1;
+      }
+      .content p {
+        margin: 0 0 5px 0;
+      }
+      .date {
+        color: #888;
+        font-size: 0.85em;
+      }
+      .actions button {
+        margin-left: 5px;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .actions button.accept {
+        background-color: #4caf50;
+        color: #fff;
+      }
+      .actions button.reject {
+        background-color: #f44336;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Notificações</h1>
+      <!-- Área onde as notificações serão exibidas -->
+      <div id="notifications"></div>
+    </div>
+
+    <script>
+      /**
+       * Formata a data para exibição no padrão brasileiro
+       * @param {string} dateStr - String de data em ISO
+       * @returns {string} Data formatada
+       */
+      function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleString("pt-BR");
+      }
+
+      /**
+       * Renderiza a lista de notificações na interface
+       * @param {Array} notifications - Array de notificações
+       */
+      function renderNotifications(notifications) {
+        const container = document.getElementById("notifications");
+
+        // Ordena as notificações: as mais recentes no topo
+        notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        container.innerHTML = ""; // Limpa a área
+
+        notifications.forEach((notification) => {
+          // Cria o container da notificação
+          const notifDiv = document.createElement("div");
+          notifDiv.classList.add("notification");
+          notifDiv.dataset.id = notification.id;
+
+          // Cria a área de conteúdo (mensagem e data)
+          const contentDiv = document.createElement("div");
+          contentDiv.classList.add("content");
+          const messageP = document.createElement("p");
+          messageP.textContent = notification.message;
+          const dateSpan = document.createElement("span");
+          dateSpan.classList.add("date");
+          dateSpan.textContent = formatDate(notification.date);
+          contentDiv.appendChild(messageP);
+          contentDiv.appendChild(dateSpan);
+
+          // Cria os botões de ação
+          const actionsDiv = document.createElement("div");
+          actionsDiv.classList.add("actions");
+
+          const acceptBtn = document.createElement("button");
+          acceptBtn.classList.add("accept");
+          acceptBtn.textContent = "Aceitar";
+          acceptBtn.onclick = () => handleAction(notification.id, "aceitar");
+
+          const rejectBtn = document.createElement("button");
+          rejectBtn.classList.add("reject");
+          rejectBtn.textContent = "Rejeitar";
+          rejectBtn.onclick = () => handleAction(notification.id, "rejeitar");
+
+          actionsDiv.appendChild(acceptBtn);
+          actionsDiv.appendChild(rejectBtn);
+
+          // Adiciona o conteúdo e as ações à notificação
+          notifDiv.appendChild(contentDiv);
+          notifDiv.appendChild(actionsDiv);
+
+          container.appendChild(notifDiv);
+        });
+      }
+
+      /**
+       * Envia a ação (aceitar ou rejeitar) para o endpoint configurado
+       * @param {string} id - ID da notificação
+       * @param {string} action - Ação a ser executada ("aceitar" ou "rejeitar")
+       */
+      function handleAction(id, action) {
+        const payload = {
+          id: id,
+          action: action,
+        };
+
+        fetch(
+          "https://webhook.autocreativeroom.com.br/webhook/teste_response",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Resposta do n8n:", data);
+            // Após o processamento, remove a notificação da interface
+            removeNotification(id);
+          })
+          .catch((error) => console.error("Erro ao enviar ação:", error));
+      }
+
+      /**
+       * Remove a notificação da interface após o tratamento da ação
+       * @param {string} id - ID da notificação a ser removida
+       */
+      function removeNotification(id) {
+        const notif = document.querySelector(`.notification[data-id="${id}"]`);
+        if (notif) {
+          notif.remove();
+        }
+      }
+
+      /**
+       * Busca as notificações no endpoint configurado
+       * O endpoint deve retornar um JSON com a propriedade "notifications"
+       */
+      function fetchNotifications() {
+        fetch(
+          "https://webhook.autocreativeroom.com.br/webhook/teste_response?getNotifications=true"
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.notifications) {
+              renderNotifications(data.notifications);
+            }
+          })
+          .catch((error) =>
+            console.error("Erro ao buscar notificações:", error)
+          );
+      }
+
+      // Inicia o _polling_ a cada 10 segundos
+      setInterval(fetchNotifications, 10000);
+      // Chamada inicial
+      fetchNotifications();
+    </script>
+  </body>
+</html>
