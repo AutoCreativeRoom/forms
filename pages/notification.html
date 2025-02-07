@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -64,40 +64,33 @@
   <body>
     <div class="container">
       <h1>Notificações</h1>
-      <!-- Área onde as notificações serão exibidas -->
+     
       <div id="notifications"></div>
     </div>
 
     <script>
-      /**
-       * Formata a data para exibição no padrão brasileiro
-       * @param {string} dateStr - String de data em ISO
-       * @returns {string} Data formatada
-       */
+ 
       function formatDate(dateStr) {
         const date = new Date(dateStr);
         return date.toLocaleString("pt-BR");
       }
 
-      /**
-       * Renderiza a lista de notificações na interface
-       * @param {Array} notifications - Array de notificações
-       */
+   
       function renderNotifications(notifications) {
         const container = document.getElementById("notifications");
 
         // Ordena as notificações: as mais recentes no topo
         notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        container.innerHTML = ""; // Limpa a área
+        container.innerHTML = ""; 
 
         notifications.forEach((notification) => {
-          // Cria o container da notificação
+  
           const notifDiv = document.createElement("div");
           notifDiv.classList.add("notification");
           notifDiv.dataset.id = notification.id;
 
-          // Cria a área de conteúdo (mensagem e data)
+   
           const contentDiv = document.createElement("div");
           contentDiv.classList.add("content");
           const messageP = document.createElement("p");
@@ -108,7 +101,6 @@
           contentDiv.appendChild(messageP);
           contentDiv.appendChild(dateSpan);
 
-          // Cria os botões de ação
           const actionsDiv = document.createElement("div");
           actionsDiv.classList.add("actions");
 
@@ -125,7 +117,7 @@
           actionsDiv.appendChild(acceptBtn);
           actionsDiv.appendChild(rejectBtn);
 
-          // Adiciona o conteúdo e as ações à notificação
+
           notifDiv.appendChild(contentDiv);
           notifDiv.appendChild(actionsDiv);
 
@@ -133,11 +125,7 @@
         });
       }
 
-      /**
-       * Envia a ação (aceitar ou rejeitar) para o endpoint configurado
-       * @param {string} id - ID da notificação
-       * @param {string} action - Ação a ser executada ("aceitar" ou "rejeitar")
-       */
+
       function handleAction(id, action) {
         const payload = {
           id: id,
@@ -163,10 +151,7 @@
           .catch((error) => console.error("Erro ao enviar ação:", error));
       }
 
-      /**
-       * Remove a notificação da interface após o tratamento da ação
-       * @param {string} id - ID da notificação a ser removida
-       */
+
       function removeNotification(id) {
         const notif = document.querySelector(`.notification[data-id="${id}"]`);
         if (notif) {
@@ -174,10 +159,6 @@
         }
       }
 
-      /**
-       * Busca as notificações no endpoint configurado
-       * O endpoint deve retornar um JSON com a propriedade "notifications"
-       */
       function fetchNotifications() {
         fetch(
           "https://webhook.autocreativeroom.com.br/webhook/teste_response?getNotifications=true"
@@ -199,4 +180,4 @@
       fetchNotifications();
     </script>
   </body>
-</html>
+</html> -->
