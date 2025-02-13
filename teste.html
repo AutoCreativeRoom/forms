@@ -1,292 +1,228 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lista de Notificações</title>
+    <title>Chat com IA</title>
     <style>
-      * {
+      body {
+        font-family: "Poppins", sans-serif;
         margin: 0;
         padding: 0;
-        box-sizing: border-box;
       }
 
-      body {
-        font-family: "Arial", sans-serif;
-        background-color: #f4f7fa;
-        color: #333;
+      .chat-icon {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 50%;
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        justify-content: flex-start;
-        height: 100vh;
+        font-size: 30px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s;
+        z-index: 1001;
+      }
+
+      .chat-icon:hover {
+        background-color: #007bff;
+      }
+
+      /* Estilo do chat */
+      .chat-container {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        max-width: 800px;
+        width: 100%;
+        height: 600px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: none; /* Inicialmente oculto */
+        flex-direction: column;
+        z-index: 1000;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        0% {
+          transform: translateY(100%);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      .chat-box {
+        flex-grow: 1;
         padding: 20px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ddd;
+        padding-top: 40px;
       }
 
-      h1 {
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 20px;
+      .message {
+        margin: 10px 0;
+        padding: 8px 12px;
+        border-radius: 10px;
+        max-width: 80%;
+        word-wrap: break-word;
       }
 
-      h2 {
-        margin-top: 50px;
-        font-size: 2rem;
-        color: #555;
-        margin-bottom: 10px;
+      .message.user {
+        background-color: #5f84fc38;
+        margin-left: auto;
+        text-align: right;
+        font-size: 14px;
       }
 
-      #fetchButton {
+      .message.bot {
+        background-color: #f7f7f7;
+        color: #3b3b3b;
+        margin-right: auto;
+        text-align: left;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .input-container {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #ddd;
+      }
+
+      .input-container input {
+        flex-grow: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      .input-container button {
         background-color: #007bff;
         color: white;
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        font-size: 1rem;
-        transition: background-color 0.3s ease;
-        margin-bottom: 20px;
+        margin-left: 10px;
       }
 
-      #fetchButton:hover {
+      .input-container button:hover {
         background-color: #0056b3;
       }
 
-      ul {
-        width: 100%;
-        max-width: 800px;
-        list-style-type: none;
-      }
-
-      li {
-        background-color: white;
-        padding: 8px 15px;
-        margin: 10px 0;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 1rem;
-      }
-
-      button {
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
         border: none;
-        padding: 6px 10px;
-        border-radius: 5px;
+        color: #007bff;
+        font-size: 24px;
+        font-weight: bold;
         cursor: pointer;
-        font-size: 1rem;
-        transition: opacity 0.3s ease;
+        z-index: 1010;
       }
 
-      .accept-button {
-        background-color: #28a745;
-        color: white;
-        margin-right: 10px;
-      }
-
-      .reject-button {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      .accept-button:hover,
-      .reject-button:hover {
-        opacity: 0.8;
-      }
-
-      .accept-button:active,
-      .reject-button:active {
-        opacity: 0.6;
-      }
-
-      #historyList {
-        width: 100%;
-        max-width: 800px;
-      }
-
-      #historyList li {
-        background-color: #f8f9fa;
-        padding: 12px;
-        margin-bottom: 8px;
-        border-left: 5px solid #007bff;
-        font-size: 0.8rem;
-      }
-
-      .status-aceito {
-        background-color: #d4edda;
-        color: #155724;
-        font-weight: bold;
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-
-      .status-rejeitado {
-        background-color: #f8d7da;
-        color: #721c24;
-        font-weight: bold;
-        padding: 2px 6px;
-        border-radius: 4px;
+      .close-button:hover {
+        color: #0056b3;
       }
     </style>
   </head>
   <body>
-    <h1>Notificações</h1>
-    <button id="fetchButton">Atualizar Notificações</button>
-    <ul id="notificationList"></ul>
+    <div class="chat-icon" id="chatIcon" onclick="toggleChat()">💬</div>
 
-    <h2>Histórico</h2>
-    <ul id="historyList"></ul>
+    <div class="chat-container" id="chatContainer">
+      <button class="close-button" onclick="toggleChat()">×</button>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="input-container">
+        <input
+          type="text"
+          id="userInput"
+          placeholder="Digite sua pergunta..."
+        />
+        <button onclick="sendMessage()">Enviar</button>
+      </div>
+    </div>
 
     <script>
-      const fetchEndpoint =
-        "https://webhook.autocreativeroom.com.br/webhook/teste_response";
-      const statusEndpoint =
-        "https://webhook.autocreativeroom.com.br/webhook/recebe_status";
-      const historyEndpoint =
-        "https://webhook.autocreativeroom.com.br/webhook/teste_historico";
+      const webhookUrl =
+        "https://webhook.autocreativeroom.com.br/webhook/chat_historico_interacoes";
 
-      let lastNotifications = [];
+      function toggleChat() {
+        const chatContainer = document.getElementById("chatContainer");
+        chatContainer.style.display =
+          chatContainer.style.display === "none" ||
+          chatContainer.style.display === ""
+            ? "flex"
+            : "none";
+      }
 
-      // Função para buscar as notificações
-      function fetchData() {
-        fetch(fetchEndpoint)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Dados retornados:", data);
+      function appendMessage(content, isUser = false) {
+        const chatBox = document.getElementById("chatBox");
+        const messageDiv = document.createElement("div");
+        messageDiv.classList.add("message");
+        if (isUser) {
+          messageDiv.classList.add("user");
+        } else {
+          messageDiv.classList.add("bot");
+        }
+        messageDiv.textContent = content;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
 
-            if (data && data.data && Array.isArray(data.data)) {
-              let notifications = data.data;
+      async function sendMessage() {
+        const userInput = document.getElementById("userInput").value;
+        if (!userInput.trim()) return;
 
-              if (
-                JSON.stringify(notifications) !==
-                JSON.stringify(lastNotifications)
-              ) {
-                lastNotifications = notifications;
+        appendMessage(userInput, true);
 
-                const listElement = document.getElementById("notificationList");
-                listElement.innerHTML = "";
+        document.getElementById("userInput").value = "";
 
-                if (notifications.length === 0) {
-                  listElement.innerHTML =
-                    "<li>Nenhuma notificação encontrada.</li>";
-                } else {
-                  notifications.forEach((item) => {
-                    const li = document.createElement("li");
-                    li.textContent = `${item.nome} - ${item.email} - ${item.mesage}`;
-
-                    const acceptButton = document.createElement("button");
-                    acceptButton.textContent = "Aceitar";
-                    acceptButton.classList.add("accept-button");
-                    acceptButton.onclick = () =>
-                      updateStatus(item, "aceito", li);
-
-                    const rejectButton = document.createElement("button");
-                    rejectButton.textContent = "Rejeitar";
-                    rejectButton.classList.add("reject-button");
-                    rejectButton.onclick = () =>
-                      updateStatus(item, "rejeitado", li);
-
-                    li.appendChild(acceptButton);
-                    li.appendChild(rejectButton);
-                    listElement.appendChild(li);
-                  });
-                }
-              }
-            } else {
-              console.error("Formato de dados inválido:", data);
-            }
-          })
-          .catch((error) => {
-            console.error("Erro ao buscar notificações:", error);
+        try {
+          const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              message: userInput,
+            }),
           });
-      }
 
-      // Função para atualizar o status
-      function updateStatus(item, status, liElement) {
-        const requestData = { ...item, action: status };
+          const data = await response.json();
+          console.log("Resposta do Webhook:", data);
 
-        fetch(statusEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestData),
-        })
-          .then((response) => response.json())
-          .then((responseData) => {
-            console.log("Resposta do servidor:", responseData);
-            if (
-              responseData &&
-              responseData.data &&
-              Array.isArray(responseData.data)
-            ) {
-              updateHistory(responseData.data);
-            } else {
-              console.error(
-                "Formato de dados inválido na resposta:",
-                responseData
-              );
-            }
-            liElement.remove();
-          })
-          .catch((error) => console.error("Erro ao enviar status:", error));
-      }
-
-      // Função para atualizar o histórico vindo do webhook
-      function updateHistoryFromWebhook() {
-        fetch(historyEndpoint)
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Histórico atualizado:", data);
-            if (data && data.data && Array.isArray(data.data)) {
-              updateHistory(data.data);
-            } else {
-              console.error("Formato de dados inválido no histórico:", data);
-            }
-          })
-          .catch((error) => {
-            console.error("Erro ao buscar histórico:", error);
-          });
-      }
-
-      // Função para atualizar o histórico
-      function updateHistory(historyData) {
-        const historyList = document.getElementById("historyList");
-        historyList.innerHTML = "";
-
-        const sortedData = historyData.sort(
-          (a, b) => new Date(b.created_at) - new Date(a.created_at)
-        );
-
-        sortedData.forEach((item) => {
-          const li = document.createElement("li");
-
-          const actionSpan = document.createElement("span");
-          actionSpan.textContent = `Ação: ${item.action}`;
-
-          if (item.action === "aceito") {
-            actionSpan.classList.add("status-aceito");
-          } else if (item.action === "rejeitado") {
-            actionSpan.classList.add("status-rejeitado");
+          if (data && data.output) {
+            appendMessage(data.output);
+          } else {
+            appendMessage("Desculpe, não entendi. Tente novamente.");
           }
-
-          li.innerHTML = `${item.nome} - ${item.email} - ${item.mesage} - `;
-          li.appendChild(actionSpan);
-          li.innerHTML += ` - Data: ${new Date(
-            item.created_at
-          ).toLocaleString()}`;
-          historyList.appendChild(li);
-        });
+        } catch (error) {
+          console.error("Erro ao enviar a mensagem:", error);
+          appendMessage(
+            "Erro ao enviar a mensagem. Tente novamente mais tarde."
+          );
+        }
       }
-
-      // Chama as funções ao carregar a página
-      window.onload = function () {
-        fetchData();
-        updateHistoryFromWebhook();
-      };
 
       document
-        .getElementById("fetchButton")
-        .addEventListener("click", fetchData);
+        .getElementById("userInput")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            sendMessage();
+          }
+        });
     </script>
   </body>
 </html>
