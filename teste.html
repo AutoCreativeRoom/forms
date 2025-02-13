@@ -9,85 +9,114 @@
     <button id="fetchButton">Atualizar Notificações</button>
     <ul id="notificationList"></ul>
 
+    <h2>Histórico</h2>
+    <ul id="historyList"></ul>
+
     <script>
-      // URLs dos endpoints do n8n
       const fetchEndpoint =
         "https://webhook.autocreativeroom.com.br/webhook/teste_response";
       const statusEndpoint =
         "https://webhook.autocreativeroom.com.br/webhook/recebe_status";
 
-      // Função para buscar as notificações
       function fetchData() {
         fetch(fetchEndpoint)
           .then((response) => response.json())
           .then((data) => {
             console.log("Dados retornados:", data);
 
-            let notifications =
-              data.data && Array.isArray(data.data) ? data.data : [];
+            if (data && data.data && Array.isArray(data.data)) {
+              let notifications = data.data;
 
-            const listElement = document.getElementById("notificationList");
-            listElement.innerHTML = "";
+              const listElement = document.getElementById("notificationList");
+              listElement.innerHTML = "";
 
-            if (notifications.length === 0) {
-              listElement.innerHTML =
-                "<li>Nenhuma notificação encontrada.</li>";
+              if (notifications.length === 0) {
+                listElement.innerHTML =
+                  "<li>Nenhuma notificação encontrada.</li>";
+              } else {
+                notifications.forEach((item) => {
+                  const li = document.createElement("li");
+                  li.textContent = `${item.nome} - ${item.email} - ${item.mesage}`;
+
+                  const acceptButton = document.createElement("button");
+                  acceptButton.textContent = "Aceitar";
+                  acceptButton.onclick = () => updateStatus(item, "aceito", li); // Passar o "li" para remover após a ação
+
+                  const rejectButton = document.createElement("button");
+                  rejectButton.textContent = "Rejeitar";
+                  rejectButton.onclick = () =>
+                    updateStatus(item, "rejeitado", li); // Passar o "li" para remover após a ação
+
+                  li.appendChild(acceptButton);
+                  li.appendChild(rejectButton);
+                  listElement.appendChild(li);
+                });
+              }
             } else {
-              notifications.forEach((item) => {
-                const li = document.createElement("li");
-                li.textContent = `${item.nome} - ${item.email} - ${item.mesage}`;
-
-                // Botão "Aceitar"
-                const acceptButton = document.createElement("button");
-                acceptButton.textContent = "Aceitar";
-                acceptButton.onclick = () =>
-                  updateStatus(
-                    item.email,
-                    "aceito",
-                    item.id,
-                    item.id_client,
-                    item.notification_type
-                  );
-
-                // Botão "Rejeitar"
-                const rejectButton = document.createElement("button");
-                rejectButton.textContent = "Rejeitar";
-                rejectButton.onclick = () =>
-                  updateStatus(
-                    item.email,
-                    "rejeitado",
-                    item.id,
-                    item.id_client,
-                    item.notification_type
-                  );
-
-                li.appendChild(acceptButton);
-                li.appendChild(rejectButton);
-                listElement.appendChild(li);
-              });
+              console.error("Formato de dados inválido:", data);
+              alert("Erro ao carregar notificações. Tente novamente.");
             }
           })
           .catch((error) => {
             console.error("Erro ao buscar as notificações:", error);
+            alert("Erro ao buscar as notificações. Tente novamente.");
           });
       }
 
-      // Função para enviar o novo status com id, id_client e notification_type
-      function updateStatus(email, status, id, id_client, notification_type) {
+      function updateStatus(item, status, liElement) {
+        const requestData = {
+          ...item,
+          action: status,
+        };
+
         fetch(statusEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            status,
-            id,
-            id_client,
-            notification_type,
-          }),
+          body: JSON.stringify(requestData),
         })
           .then((response) => response.json())
-          .then((data) => console.log("Resposta do servidor:", data))
+          .then((responseData) => {
+            console.log("Resposta do servidor:", responseData);
+            if (
+              responseData &&
+              responseData.data &&
+              Array.isArray(responseData.data)
+            ) {
+              updateHistory(responseData.data); // Exibe a lista de respostas no histórico
+            } else {
+              console.error(
+                "Formato de dados inválido na resposta:",
+                responseData
+              );
+              alert("Erro ao processar a resposta. Tente novamente.");
+            }
+            // Remover a linha da interface
+            liElement.remove();
+          })
           .catch((error) => console.error("Erro ao enviar status:", error));
+      }
+
+      function updateHistory(historyData) {
+        const historyList = document.getElementById("historyList");
+
+        // Limpar o histórico atual antes de adicionar novos itens
+        historyList.innerHTML = "";
+
+        // Ordenar os dados pela data de criação (do mais recente para o mais antigo)
+        const sortedData = historyData.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        // Adicionar cada item da resposta no histórico
+        sortedData.forEach((item) => {
+          const li = document.createElement("li");
+          li.textContent = `${item.nome} - ${item.email} - ${
+            item.mesage
+          } - Ação: ${item.action} - Data: ${new Date(
+            item.created_at
+          ).toLocaleString()}`;
+          historyList.appendChild(li);
+        });
       }
 
       document
