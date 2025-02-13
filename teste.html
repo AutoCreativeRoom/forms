@@ -143,9 +143,12 @@
         "https://webhook.autocreativeroom.com.br/webhook/teste_response";
       const statusEndpoint =
         "https://webhook.autocreativeroom.com.br/webhook/recebe_status";
+      const historyEndpoint =
+        "https://webhook.autocreativeroom.com.br/webhook/teste_historico";
 
       let lastNotifications = [];
 
+      // Função para buscar as notificações
       function fetchData() {
         fetch(fetchEndpoint)
           .then((response) => response.json())
@@ -199,6 +202,7 @@
           });
       }
 
+      // Função para atualizar o status
       function updateStatus(item, status, liElement) {
         const requestData = { ...item, action: status };
 
@@ -227,6 +231,24 @@
           .catch((error) => console.error("Erro ao enviar status:", error));
       }
 
+      // Função para atualizar o histórico vindo do webhook
+      function updateHistoryFromWebhook() {
+        fetch(historyEndpoint)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Histórico atualizado:", data);
+            if (data && data.data && Array.isArray(data.data)) {
+              updateHistory(data.data);
+            } else {
+              console.error("Formato de dados inválido no histórico:", data);
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao buscar histórico:", error);
+          });
+      }
+
+      // Função para atualizar o histórico
       function updateHistory(historyData) {
         const historyList = document.getElementById("historyList");
         historyList.innerHTML = "";
@@ -256,11 +278,15 @@
         });
       }
 
+      // Chama as funções ao carregar a página
+      window.onload = function () {
+        fetchData();
+        updateHistoryFromWebhook();
+      };
+
       document
         .getElementById("fetchButton")
         .addEventListener("click", fetchData);
-
-      fetchData();
     </script>
   </body>
 </html>
