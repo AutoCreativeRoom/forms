@@ -1,19 +1,138 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat com IA</title>
+    <title>Lista de Notificações e Chat com IA</title>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
         font-family: "Poppins", sans-serif;
-        margin: 0;
-        padding: 0;
+        background-color: #f4f7fa;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100vh;
+        padding: 20px;
       }
       p {
-        margin: 0;
-        padding: 0;
+        padding: 10px;
       }
+      h1 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        margin-top: 50px;
+        font-size: 2rem;
+        color: #555;
+        margin-bottom: 10px;
+      }
+
+      #fetchButton {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      #fetchButton:hover {
+        background-color: #0056b3;
+      }
+
+      ul {
+        width: 100%;
+        max-width: 800px;
+        list-style-type: none;
+      }
+
+      li {
+        background-color: white;
+        padding: 8px 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1rem;
+      }
+
+      button {
+        border: none;
+        padding: 6px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: opacity 0.3s ease;
+      }
+
+      .accept-button {
+        background-color: #28a745;
+        color: white;
+        margin-right: 10px;
+      }
+
+      .reject-button {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .accept-button:hover,
+      .reject-button:hover {
+        opacity: 0.8;
+      }
+
+      .accept-button:active,
+      .reject-button:active {
+        opacity: 0.6;
+      }
+
+      #historyList {
+        width: 100%;
+        max-width: 800px;
+      }
+
+      #historyList li {
+        background-color: #f8f9fa;
+        padding: 12px;
+        margin-bottom: 8px;
+        border-left: 5px solid #007bff;
+        font-size: 0.8rem;
+      }
+
+      .status-aceito {
+        background-color: #d4edda;
+        color: #155724;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      .status-rejeitado {
+        background-color: #f8d7da;
+        color: #721c24;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      /* ########## */
+
       .chat-icon {
         position: fixed;
         bottom: 20px;
@@ -82,7 +201,6 @@
       .message-box {
         background-color: #e4d7ff6e;
         max-width: max-content;
-        padding: 10px;
         border-radius: 4px;
         text-align: left;
       }
@@ -98,6 +216,7 @@
       }
       .user .message-box {
         background-color: #d7e9ff;
+        padding: 10px;
       }
       .bot {
         color: #3b3b3b;
@@ -154,6 +273,13 @@
     </style>
   </head>
   <body>
+    <h1>Notificações</h1>
+    <button id="fetchButton">Atualizar Notificações</button>
+    <ul id="notificationList"></ul>
+
+    <h2>Histórico</h2>
+    <ul id="historyList"></ul>
+
     <div class="chat-icon" id="chatIcon" onclick="toggleChat()">💬</div>
 
     <div class="chat-container" id="chatContainer">
@@ -168,6 +294,157 @@
         <button onclick="sendMessage()">Enviar</button>
       </div>
     </div>
+
+    <script>
+      const fetchEndpoint =
+        "https://webhook.autocreativeroom.com.br/webhook/teste_response";
+      const statusEndpoint =
+        "https://webhook.autocreativeroom.com.br/webhook/recebe_status";
+      const historyEndpoint =
+        "https://webhook.autocreativeroom.com.br/webhook/teste_historico";
+
+      let lastNotifications = [];
+
+      // Função para buscar as notificações
+      function fetchData() {
+        fetch(fetchEndpoint)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Dados retornados:", data);
+
+            if (data && data.data && Array.isArray(data.data)) {
+              let notifications = data.data;
+
+              if (
+                JSON.stringify(notifications) !==
+                JSON.stringify(lastNotifications)
+              ) {
+                lastNotifications = notifications;
+
+                const listElement = document.getElementById("notificationList");
+                listElement.innerHTML = "";
+
+                if (notifications.length === 0) {
+                  listElement.innerHTML =
+                    "<li>Nenhuma notificação encontrada.</li>";
+                } else {
+                  notifications.forEach((item) => {
+                    const li = document.createElement("li");
+                    li.textContent = `${item.nome} - ${item.email} - ${item.mesage}`;
+
+                    const acceptButton = document.createElement("button");
+                    acceptButton.textContent = "Aceitar";
+                    acceptButton.classList.add("accept-button");
+                    acceptButton.onclick = () =>
+                      updateStatus(item, "aceito", li);
+
+                    const rejectButton = document.createElement("button");
+                    rejectButton.textContent = "Rejeitar";
+                    rejectButton.classList.add("reject-button");
+                    rejectButton.onclick = () =>
+                      updateStatus(item, "rejeitado", li);
+
+                    li.appendChild(acceptButton);
+                    li.appendChild(rejectButton);
+                    listElement.appendChild(li);
+                  });
+                }
+              }
+            } else {
+              console.error("Formato de dados inválido:", data);
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao buscar notificações:", error);
+          });
+      }
+
+      // Função para atualizar o status
+      function updateStatus(item, status, liElement) {
+        const requestData = { ...item, action: status };
+
+        fetch(statusEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
+        })
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log("Resposta do servidor:", responseData);
+            if (
+              responseData &&
+              responseData.data &&
+              Array.isArray(responseData.data)
+            ) {
+              updateHistory(responseData.data);
+            } else {
+              console.error(
+                "Formato de dados inválido na resposta:",
+                responseData
+              );
+            }
+            liElement.remove();
+          })
+          .catch((error) => console.error("Erro ao enviar status:", error));
+      }
+
+      // Função para atualizar o histórico vindo do webhook
+      function updateHistoryFromWebhook() {
+        fetch(historyEndpoint)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Histórico atualizado:", data);
+            if (data && data.data && Array.isArray(data.data)) {
+              updateHistory(data.data);
+            } else {
+              console.error("Formato de dados inválido no histórico:", data);
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao buscar histórico:", error);
+          });
+      }
+
+      // Função para atualizar o histórico
+      function updateHistory(historyData) {
+        const historyList = document.getElementById("historyList");
+        historyList.innerHTML = "";
+
+        const sortedData = historyData.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        sortedData.forEach((item) => {
+          const li = document.createElement("li");
+
+          const actionSpan = document.createElement("span");
+          actionSpan.textContent = `Ação: ${item.action}`;
+
+          if (item.action === "aceito") {
+            actionSpan.classList.add("status-aceito");
+          } else if (item.action === "rejeitado") {
+            actionSpan.classList.add("status-rejeitado");
+          }
+
+          li.innerHTML = `${item.nome} - ${item.email} - ${item.mesage} - `;
+          li.appendChild(actionSpan);
+          li.innerHTML += ` - Data: ${new Date(
+            item.created_at
+          ).toLocaleString()}`;
+          historyList.appendChild(li);
+        });
+      }
+
+      // Chama as funções ao carregar a página
+      window.onload = function () {
+        fetchData();
+        updateHistoryFromWebhook();
+      };
+
+      document
+        .getElementById("fetchButton")
+        .addEventListener("click", fetchData);
+    </script>
 
     <script>
       function toggleChat() {
