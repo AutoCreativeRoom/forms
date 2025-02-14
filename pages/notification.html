@@ -443,14 +443,22 @@
 
     <!-- Script para o Chat com persistência -->
     <script>
-      // Alterna a exibição do chat
+      // Alterna a exibição do chat e garante o scroll para as últimas mensagens
       function toggleChat() {
         const chatContainer = document.getElementById("chatContainer");
-        chatContainer.style.display =
+        if (
           chatContainer.style.display === "none" ||
           chatContainer.style.display === ""
-            ? "flex"
-            : "none";
+        ) {
+          chatContainer.style.display = "flex";
+          // Aguarda um breve momento para o chat renderizar e realiza o scroll
+          setTimeout(() => {
+            const chatBox = document.getElementById("chatBox");
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }, 50);
+        } else {
+          chatContainer.style.display = "none";
+        }
       }
 
       // Salva a mensagem no localStorage
