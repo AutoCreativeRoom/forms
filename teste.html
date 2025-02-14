@@ -295,6 +295,7 @@
       </div>
     </div>
 
+    <!-- Script para notificações e histórico -->
     <script>
       const fetchEndpoint =
         "https://webhook.autocreativeroom.com.br/webhook/teste_response";
@@ -435,18 +436,14 @@
         });
       }
 
-      // Chama as funções ao carregar a página
-      window.onload = function () {
-        fetchData();
-        updateHistoryFromWebhook();
-      };
-
       document
         .getElementById("fetchButton")
         .addEventListener("click", fetchData);
     </script>
 
+    <!-- Script para o Chat com persistência -->
     <script>
+      // Alterna a exibição do chat
       function toggleChat() {
         const chatContainer = document.getElementById("chatContainer");
         chatContainer.style.display =
@@ -456,7 +453,19 @@
             : "none";
       }
 
-      function appendMessage(content, isUser = false) {
+      // Salva a mensagem no localStorage
+      function saveMessage(content, isUser) {
+        let messages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+        messages.push({ content, isUser });
+        // Limita o array às últimas 10 mensagens
+        if (messages.length > 10) {
+          messages.shift(); // remove a mensagem mais antiga
+        }
+        localStorage.setItem("chatMessages", JSON.stringify(messages));
+      }
+
+      // Adiciona uma mensagem na área do chat e salva-a, se necessário
+      function appendMessage(content, isUser = false, shouldSave = true) {
         const chatBox = document.getElementById("chatBox");
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message", isUser ? "user" : "bot");
@@ -468,8 +477,13 @@
         messageDiv.appendChild(messageBox);
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (shouldSave) {
+          saveMessage(content, isUser);
+        }
       }
 
+      // Envia a mensagem do usuário e trata a resposta do servidor
       async function sendMessage() {
         const userInput = document.getElementById("userInput").value;
         if (!userInput.trim()) return;
@@ -505,6 +519,15 @@
         }
       }
 
+      // Carrega as mensagens persistidas do localStorage
+      function loadPersistedMessages() {
+        const messages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+        messages.forEach((msg) => {
+          // O terceiro parâmetro 'false' evita salvar novamente durante o carregamento
+          appendMessage(msg.content, msg.isUser, false);
+        });
+      }
+
       document
         .getElementById("userInput")
         .addEventListener("keypress", function (event) {
@@ -512,6 +535,13 @@
             sendMessage();
           }
         });
+
+      // Ao carregar a página, inicializa as funções
+      window.onload = function () {
+        fetchData();
+        updateHistoryFromWebhook();
+        loadPersistedMessages();
+      };
     </script>
   </body>
 </html>
